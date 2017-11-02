@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="cn.itcast.dao.CustomerDao">
+
+	<sql id="where">
+		<if test="custSource != null and custSource != '' ">
+			AND c.`cust_source` = #{custSource}
+		</if>
+		<if test="custIndustry != null and custIndustry != '' ">
+			AND c.`cust_industry` = #{custIndustry}
+		</if>
+		<if test="custLevel != null and custLevel != '' ">
+			AND c.`cust_level` = #{custLevel}
+		</if>
+		<if test="custName != null and custName != '' ">
+			AND c.`cust_name` LIKE '%${custName}%'
+		</if>
+	</sql>
+
+	
+	<select id="findByVo" parameterType="cn.itcast.domain.CustomerQueryVo" resultType="cn.itcast.domain.Customer">
+		SELECT
+			c.cust_id,
+			c.cust_name,
+			c.cust_phone,
+			c.cust_mobile,
+			b1.dict_item_name as cust_source,
+			b2.dict_item_name as cust_industry,
+			b3.dict_item_name as cust_level
+		FROM
+			customer c
+			LEFT JOIN base_dict b1 ON c.`cust_source` =  b1.`dict_type_code` AND c.`cust_source` = '002' AND b1.`dict_enable` = '1'
+			LEFT JOIN base_dict b2 ON c.`cust_industry` = b2.`dict_type_code` AND c.`cust_industry` = '001' AND b2.`dict_enable` = '1'
+			LEFT JOIN base_dict b3 ON c.`cust_level` = b3.`dict_type_code` AND c.`cust_level` = '006' AND b3.`dict_enable` = '1'
+		<where>
+			<include refid="where"/>
+		</where>
+		LIMIT #{start},#{size}
+	</select>
+	
+	<select id="findByVoForCount" parameterType="cn.itcast.domain.CustomerQueryVo" resultType="int">
+		SELECT
+			count(1)
+		FROM
+			customer c
+			LEFT JOIN base_dict b1 ON c.`cust_source` =  b1.`dict_type_code` AND c.`cust_source` = '002' AND b1.`dict_enable` = '1'
+			LEFT JOIN base_dict b2 ON c.`cust_industry` = b2.`dict_type_code` AND c.`cust_industry` = '001' AND b2.`dict_enable` = '1'
+			LEFT JOIN base_dict b3 ON c.`cust_level` = b3.`dict_type_code` AND c.`cust_level` = '006' AND b3.`dict_enable` = '1'
+		<where>
+			<include refid="where"/>
+		</where>
+	</select>
+	
+	
+	<select id="findByCustId" parameterType="long" resultType="cn.itcast.domain.Customer">
+		select
+			cust_id,
+			cust_name,
+			cust_user_id,
+			cust_source,
+			cust_industry,
+			cust_level,
+			cust_linkman,
+			cust_phone,
+			cust_mobile,
+			cust_zipcode,
+			cust_address
+		from
+			customer
+		where
+			cust_id = #{id}
+	</select>
+	
+	<update id="updateByCustId" parameterType="cn.itcast.domain.Customer">
+		update 
+			customer
+		<set>
+			<if test="cust_name != null and cust_name != ''">
+				cust_name = #{cust_name},
+			</if>
+			<if test="cust_source != null and cust_source != ''">
+				cust_source = #{cust_source},
+			</if>
+			<if test="cust_industry != null and cust_industry != ''">
+				cust_industry = #{cust_industry},
+			</if>
+			<if test="cust_level != null and cust_level != ''">
+				cust_level = #{cust_level},
+			</if>
+			<if test="cust_linkman != null and cust_linkman != ''">
+				cust_linkman = #{cust_linkman},
+			</if>
+			<if test="cust_phone != null and cust_phone != ''">
+				cust_phone = #{cust_phone},
+			</if>
+			<if test="cust_mobile != null and cust_mobile != ''">
+				cust_mobile = #{cust_mobile},
+			</if>
+			<if test="cust_zipcode != null and cust_zipcode != ''">
+				cust_zipcode = #{cust_zipcode},
+			</if>
+			<if test="cust_address != null and cust_address != ''">
+				cust_address = #{cust_address},
+			</if>
+		</set>
+		where 
+			cust_id = #{cust_id}
+	</update>
+	
+	<delete id="deleteByCustId" parameterType="long">
+		delete from 
+			customer
+		<where>
+			cust_id = #{id}
+		</where>
+	</delete>
+	
+</mapper>
